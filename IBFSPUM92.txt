@@ -1,0 +1,117 @@
+#Each plugin can be commented to disable its functionality
+#Template varibales : All the values with @variable@ will be replaced with value from template variables. This avoids repetitions in development environments
+########################################
+template.domain=.shands.ufl.edu
+template.host=pplsftfs29
+template.httpport=8040
+template.jslport=9040
+template.localnode=PSFT_EP_PUM92
+template.nodename=PSFT_EP_PUM92
+template.piasite=fspum92
+template.ses_port=7777
+template.seshost=seshost
+template.sslport=8445
+template.tools_release=8.56.05
+template.userid=VP1
+########################################
+ 
+template_name=IB_TEMPLATE
+configure=false
+verify=true
+
+configure=true
+verify=true
+decrypt_password=true
+ 
+########################################
+#Rename the default local node
+########################################
+#plugin.IB Node Configuration.1=PTEM_CONFIG:PTIBRenameNode
+env.default_local_node=PSFT_EP_PUM92
+env.app_msg_purge_all_dms=true
+ 
+########################################
+#Configure the DB node
+########################################
+#plugin.IB Node Configuration.2=PTEM_CONFIG:PTIBConfigureDBNode
+env.pia_webserver_host=@host@@domain@
+env.pia_webserver_port=@httpport@
+env.pia_webserver_ssl_port=@sslport@
+env.pia_site_name=@piasite@
+env.gateway_host=@host@@domain@
+env.gateway_port=@httpport@
+env.gateway_ssl_port=@sslport@
+env.use_ssl_gateway=false
+env.use_ssl_webserver=false
+env.default_user_id=FSIBGATE
+env.default_local_node_pass=bbg1P/3kz0L6kT1aySWPiQ==
+env.default_local_node_check_token_id=
+env.anonymous_default_user_id=
+env.default_local_node=@nodename@
+env.wsdl_external_user_id=
+env.wsdl_external_pass=
+env.configure_wsdl_node=true
+env.wsdl_node_tokentype=NONE
+env.wsdl_node_tokenencrypted=0
+env.wsdl_node_tokensigned=0
+env.wsdl_node_ibencryptionlevel=H
+env.default_service_namespace=http://xmlns.oracle.com/Enterprise/Tools/services
+env.default_schema_namespace=http://xmlns.oracle.com/Enterprise/Tools/schemas
+env.service_system_status=D
+env.wsdl_alias_check=N
+env.enable_multi_queue=N
+ 
+########################################
+#Configure gateway URL, load connectors, define node in the gateway
+########################################
+plugin.IB Gateway Configuration.3=PTEM_CONFIG:PTIBConfigureGatewayNodes
+env.gateway_host=@host@@domain@
+env.gateway_port=@httpport@
+#env.gateway_port=9090
+env.gateway_ssl_port=@sslport@
+env.use_ssl_gateway=false
+env.default_local_node=@nodename@
+env.gateway_user=administrator
+env.gateway_password=dq/nwprpr27TyTcKtJq9bA==
+env.ib_appserver_host=pplsftfs19
+env.ib_jolt_port=@jslport@
+env.ib_node_proxy_userid=FSIBGATE
+env.ib_node_proxy_password=bbg1P/3kz0L6kT1aySWPiQ==
+env.tools_release=@tools_release@
+env.ib_appserver_domain_password=qQocymvCNJLDkXHIDrw96Q==
+env.ib_virtual_node=
+env.ib_set_as_default_node=true
+env.ib_synchronize_map_files=Y
+ 
+########################################
+#Set keystore password, proxy host, proxy port, non proxy host in gateway properties file
+########################################
+#plugin.IB Gateway Configuration.4=PTEM_CONFIG:PTIBConfigureGatewayProperties
+env.gateway_host=@host@@domain@
+env.gateway_port=@httpport@
+env.gateway_ssl_port=@sslport@
+env.use_ssl_gateway=false
+env.gateway_user=administrator
+env.gateway_password=dq/nwprpr27TyTcKtJq9bA==
+env.gateway_keystore_password=McqLh2Kqr0gGUX6h7avBTA==
+env.gateway_proxy_host=
+env.gateway_proxy_port=
+env.gateway_non_proxy_hosts=
+env.default_local_node=@nodename@
+env.ib_synchronize_map_files=Y
+ 
+########################################
+#Active IB Pub/Sub Domain.
+########################################
+plugin.IB Activate.5=PTEM_CONFIG:PTIBActivateDomain
+domain.activate_retry_count=10
+domain.activate_wait_time=10
+env.network_nodenames_to_cleanup=
+ 
+########################################
+#Activate IB Queues.
+########################################
+plugin.IB Activate.7=PTEM_CONFIG:PTIBActivateQueues
+queue.activate_queue_list=PS_ALL
+queue.activate_queue_status=1
+env.gateway_password=dq/nwprpr27TyTcKtJq9bA==

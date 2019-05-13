@@ -1,0 +1,181 @@
+template_name=PRCS_SCHEDULER_TEMPLATE
+
+#Tools_release=8.55-805-R2
+#Apps_release=8.0.00
+
+configure=false
+verify=true
+encrypt_password=true
+
+template.domain=.shands.ufl.edu
+template.host=pplsftfs29
+template.httpport=8040
+template.jslport=9040
+template.localnode=%LocalNode
+template.nodename=%LocalNode
+template.piasite=@webhist.ps.discovery.siteName
+template.ses_port=7777
+template.seshost=seshost
+template.sslport=8445
+template.tools_release=%ToolsRelease
+template.userid=%UserId
+template.uriresource=SchedulerTransfer/fspum92
+template.urlreport=/psreports/fspum92
+template.descrlong=FSPUM92
+
+
+#Group:Process Scheduler
+#Description:Process Scheduler Configuration
+
+##### Configure Process Scheduler Report Node configuration#####
+
+plugin.Process Scheduler.1=PTEM_CONFIG:PTProcessSchedulerReportNode
+
+#SSL Mode; Possible Values: 0 => EXPLICIT:; Possible Values: 1 => IMPLICIT:
+env.cdm_ssl_mode=0
+
+#URI Host
+env.uri_host=@host@@domain@
+
+#URLID
+env.url=http://@host@@domain@:@httpport@@urlreport@
+
+#Distribution Node Name
+env.distnodename=PSNT
+
+#Description
+env.descrlong=@descrlong@
+
+#URI Port
+env.uri_port=@httpport@
+
+#URI Resource
+env.uri_resource=@uriresource@
+
+#Protocol; Possible Values: 0 => HTTP:; Possible Values: 1 => HTTPS:; Possible Values: 2 => XCOPY:; Possible Values: 3 => FTP:; Possible Values: 4 => FTPS:; Possible Values: 5 => SFTP:
+env.cdm_proto=0
+
+#Operating System; Possible Values: 0 => DOS:; Possible Values: 1 => NT/Win95 Client:; Possible Values: 2 => Windows:; Possible Values: 3 => OS/2:; Possible Values: 4 => UNIX:; Possible Values: 5 => VMS:; Possible Values: 6 => MPE/XL:; Possible Values: 7 => OS390:; Possible Values: 9 => OS/400:
+env.opsys=2
+
+#Flag to determine if a property needs to be deleted
+env.delete_prop=N
+
+##### Configure Process Scheduler Server configuration#####
+
+plugin.Process Scheduler.2=PTEM_CONFIG:PTProcessSchedulerServerConfig
+
+#Server Name
+env.servername=PSNT
+
+#Distribution Node Name
+env.distnodename=PSNT
+
+#Maximum Transfer Retries
+env.transfermaxretry=0
+
+#Server Load Balancing Option; Possible Values: 0 => Do Not Use for Load Balancing:; Possible Values: 1 => Use for Load Balancing:
+env.srvrloadbaloptn=
+
+#Redistribute Workload Option; Possible Values: 0 => Do Not Redistribute:; Possible Values: 1 => Redistribute with same O/S:; Possible Values: 2 => Redistribute to any O/S:
+env.redistwrkoption=
+
+#Process Instance
+env.daemonprcsinst=
+
+#Maximum Concurrent Processes
+env.maxconcurrent=5,0
+
+#Notify When Suspended
+env.notifywhensusp=0
+
+#Min. Memory Required
+env.minmem=0
+
+#Distribution ID
+env.distid=ACM Administrator
+
+#Max API Aware Tasks
+env.maxapiaware=5
+
+#Notify Frequency
+env.prcsnotifyfreq=0
+
+#Start
+env.start_hours=0
+
+#Notify When Started
+env.notifywhenstartd=0
+
+#Process Priority; Possible Values: 1 => Low:; Possible Values: 5 => Medium:; Possible Values: 9 => High:
+env.prcspriority=5,5
+
+#Daemon Enabled
+env.daemonenabled=
+
+#End
+env.end_hours=23
+
+#End Minutes
+env.end_minutes=59
+
+#Notify Disabled
+env.notifydisabled=
+
+#Max. CPU Usage required
+env.maxcpu=0
+
+#Process Type
+env.prcstype= Application Engine,Crystal
+
+#Day; Possible Values: 0 => Sunday:; Possible Values: 1 => Monday:; Possible Values: 2 => Tuesday:; Possible Values: 3 => Wednesday:; Possible Values: 4 => Thursday:; Possible Values: 5 => Friday:; Possible Values: 6 => Saturday:
+env.day_ofweek=0
+
+#Sleep Time
+env.sleeptime=15
+
+#Heartbeat
+env.heartbeat=60
+
+#Transfer Log Files to Content
+env.transferlogfiles=
+
+#Interval for Transfer Attempt
+env.transferinterval=0
+
+#Process Category
+env.prcscategory=Default,LOADCACHE
+
+#Server Errors
+env.notifyservererror=0
+
+#Notify When Down
+env.notifywhendown=0
+
+#Daemon Procedure Group
+env.daemongroup=
+
+#Time
+env.start_minutes=0
+
+#Distribution ID Type; Possible Values: 2 => User ID:; Possible Values: 3 => Role Name:
+env.distidtype=3
+
+#Description
+env.descr=Server Configured via ACM
+
+#Operating System; Possible Values: 0 => DOS:; Possible Values: 1 => NT/Win95 Client:; Possible Values: 2 => Windows:; Possible Values: 3 => OS/2:; Possible Values: 4 => UNIX:; Possible Values: 5 => VMS:; Possible Values: 6 => MPE/XL:; Possible Values: 7 => OS390:; Possible Values: 9 => OS/400:
+env.opsys=2
+
+#Daemon Sleep Time
+env.daemonsleeptime=0
+
+#Daemon Recycle Count
+env.daemoncyclecnt=0
+
+#Process Type Priority: Possible values:1->Low, 5->Medium, 9->High
+env.processtypepriority=5,5
+
+#Process type Max Concurrent Value
+env.processtypemaxconcurrent=3,3
+

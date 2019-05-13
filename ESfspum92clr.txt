@@ -1,0 +1,116 @@
+template_name=SEARCH_TEMPLATE
+
+#Tools_release=8.56-808-R2
+#Apps_release=8.0.00
+
+configure=false
+verify=true
+encrypt_password=true
+
+template.domain=.shands.ufl.edu
+template.host=pplsftfs29
+template.httpport=8040
+template.nodename=%LocalNode
+template.searchhost=pplsftfs39a.shands.ufl.edu
+template.searchport=9200
+template.sslport=@webhist.PORTALHTTPSPORT
+template.userid=FSIBGATE
+
+#Group:SEARCH_GROUP
+#Description:Configure, Deploy and Index Search
+
+##### Configure Peoplesoft system to talk to Search Server and assign roles#####
+
+plugin..1=PTEM_CONFIG:PTSFConfigureSrchInstance
+
+#Search Instance name
+env.ptsf_search_instance=PTSF_SEARCH
+
+#Search Provider
+env.search_provider=ES
+
+#Search Provider
+env.search_nodes=1
+
+#
+env.node1_search_host=@searchhost@
+
+#
+env.node1_search_port=@searchport@
+
+#
+env.node1_search_use_ssl=false
+
+#
+env.node1_search_admin_user=esadmin
+
+#
+env.node1_search_admin_password=Es856admin
+
+#
+env.node1_search_read_user=people
+
+#
+env.node1_search_read_password=fsallc1
+
+#Search call back user name
+env.search_call_back_user=@userid@
+
+#Search call back user password
+env.search_call_back_password=IBNODE92
+
+#Search administrator user name
+env.ps_search_administrator_user=@userid@
+
+#Search developer user name
+env.ps_search_developer_user=@userid@
+
+#Gateway host
+env.gateway_host=@host@@domain@
+
+#Gateway port
+env.gateway_port=@httpport@
+
+#Gateway SSL port
+env.gateway_ssl_port=@sslport@
+
+#Flag determines if the configuration is secure(https) / non secure (http); True-> https, false->http
+env.use_ssl_gateway=false
+
+#Default local node
+env.default_local_node=@nodename@
+
+#Enables global search and menu search for ALL , LOCAL or coma separated list of portals
+env.enable_global_menu_search=ALL
+
+##### Deploy, Undeploy, Schedule index generation for search definitions \ categories from a selected list#####
+
+plugin.SES.2=PTEM_CONFIG:PTSFAdministerSearch
+
+#Search Instance name
+env.ptsf_search_instance=PTSF_SEARCH
+
+#Valid values are All, Global, List
+env.ptsf_selection_type=ALL
+
+#Comma separated list of search category names to be included, allows use of % using like operator
+env.ptsf_include_definitions=
+
+#Comma separated list of search category names to be excluded, allows use of % using like operator
+env.ptsf_exclude_definitions=
+
+#If true check for access to query/connected query, or invalid objects...and stop if errors found
+env.ptsf_check_audit_errors=true
+
+#Comma separated list of admin operations , Valid values are DEPLOY, INDEX, UNDEPLOY
+env.ptsf_admin_operations=UNDEPLOY,DEPLOY,INDEX
+
+#If true the schedules are created to index all languages
+env.ptsf_index_all_lanaguages=false
+
+#Max minutes to wait before reporting scheduling status, 0 to wait till finish,blank to skip report.
+env.report_schedule_status_after_minutes=
+
+#Specify the process scheduler to run the indexing on ,leave this blank to use master scheduler .
+env.ptsf_schedule_on_server=
+

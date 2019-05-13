@@ -1,0 +1,85 @@
+#Each plugin can be commented to disable its functionality
+#Template varibales : All the values with @variable@ will be replaced with value from template variables. This avoids repetitions in development environments
+########################################
+template.domain=.shands.ufl.edu
+template.host=pplsftfs29
+template.httpport=8040
+template.jslport=9040
+template.localnode=PSFT_EP_PUM92
+template.nodename=PSFT_EP_PUM92
+template.piasite=fspum92
+template.ses_port=7777
+template.seshost=seshost
+template.sslport=8445
+template.tools_release=8.56.05
+template.userid=VP1
+template.uriresource=SchedulerTransfer/fspum92
+template.urlreport=/psreports/fspum92
+template.descrlong=FSPUM92
+########################################
+ 
+template_name=PRCS_SCHEDULER_TEMPLATE
+configure=false
+verify=true
+
+configure=true
+verify=true
+decrypt_password=true
+ 
+########################################
+#Configure Process Scheduler Report Node configuration
+########################################
+plugin.Process Scheduler.1=PTEM_CONFIG:PTProcessSchedulerReportNode
+env.cdm_ssl_mode=0
+env.uri_host=@host@@domain@
+env.url=http://@host@@domain@:@httpport@@urlreport@
+env.distnodename=PSNT
+env.descrlong=@descrlong@
+env.uri_port=@httpport@
+env.uri_resource=@uriresource@
+env.cdm_proto=0
+env.opsys=2
+env.delete_prop=N
+ 
+########################################
+#Configure Process Scheduler Server configuration
+########################################
+plugin.Process Scheduler.2=PTEM_CONFIG:PTProcessSchedulerServerConfig
+env.servername=PSNT
+env.distnodename=PSNT
+env.transfermaxretry=0
+env.srvrloadbaloptn=
+env.redistwrkoption=
+env.daemonprcsinst=
+env.maxconcurrent=5,0
+env.notifywhensusp=0
+env.minmem=0
+env.distid=ACM Administrator
+env.maxapiaware=5
+env.prcsnotifyfreq=0
+env.start_hours=0
+env.notifywhenstartd=0
+env.prcspriority=5,5
+env.daemonenabled=
+env.end_hours=23
+env.end_minutes=59
+env.notifydisabled=
+env.maxcpu=0
+env.prcstype=Application Engine,Crystal
+env.day_ofweek=0
+env.sleeptime=15
+env.heartbeat=60
+env.transferlogfiles=
+env.transferinterval=0
+env.prcscategory=Default,LOADCACHE
+env.notifyservererror=0
+env.notifywhendown=0
+env.daemongroup=
+env.start_minutes=0
+env.distidtype=3
+env.descr=Server Configured via ACM
+env.opsys=2
+env.daemonsleeptime=0
+env.daemoncyclecnt=0
+env.processtypepriority=5,5
+env.processtypemaxconcurrent=3,3
