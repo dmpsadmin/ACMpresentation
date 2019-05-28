@@ -1,0 +1,217 @@
+import PT_PC_UTIL:StringMap;
+import PTEM_CONFIG:IEMConfigurationPlugin;
+import PTEM_CONFIG:PTEMHelpMessage;
+import PTEM_CONFIG:PTEMVariableProperty;
+import PTEM_CONFIG:PTCIPluginProperties;
+import PTEM_CONFIG:EMConfigurationPlugin;
+
+
+class PTRenServerDefinition extends PTEM_CONFIG:EMConfigurationPlugin
+   method getPluginHelpMessage() Returns PTEM_CONFIG:PTEMHelpMessage;
+   method getProperties() Returns array of PTEM_CONFIG:PTEMVariableProperty;
+   method getCurrentConfiguration(&variables As array of PT_PC_UTIL:StringMap, &plugin As string) Returns array of PT_PC_UTIL:StringMap;
+   
+   method validateVariables(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;
+   method configureEnvironment(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;
+   method validateConfigurations(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;
+   method dependant_plugins() Returns array of string;
+   method isInternalPlugin() Returns boolean;
+private
+   method getCIname() Returns array of string;
+end-class;
+
+
+
+method getPluginHelpMessage
+   /+ Returns PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.getPluginHelpMessage +/
+   Local PTEM_CONFIG:PTEMHelpMessage &tempMessage = Null;
+   &tempMessage = create PTEM_CONFIG:PTEMHelpMessage(278, 54, "Plugin to configure a new Renserver Definition", Null);
+   rem &tempMessage = create PTEM_CONFIG:PTEMHelpMessage(0, 0, "", Null);
+   Return &tempMessage;
+end-method;
+
+method getCIname
+   /+ Returns Array of String +/
+   
+   Local array of string &CIname;
+   &CIname = CreateArrayRept("", 0);
+   
+   &CIname.Push("RENSERVER_DEFINITION_CI");
+   
+   Return &CIname;
+end-method;
+
+method configureEnvironment
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.configureEnvironment +/
+   
+   Local PTEM_CONFIG:PTEMHelpMessage &tempMessage;
+   Local array of PTEM_CONFIG:PTEMHelpMessage &helpMsgArray = Null;
+   &helpMsgArray = CreateArrayRept(&tempMessage, 0);
+   Local integer &i;
+   
+   If %This.hasAccess() = False Then
+      Return Null;
+   End-If;
+   
+   rem start DM;
+   Local string &renexists;
+   Local string &renid = &variables.get("env.ren_definition_id");
+   Local array of string &param = Null;
+   
+   SQLExec("SELECT 'Y' FROM PSREN WHERE REN_ID = :1", &renid, &renexists);
+   
+   If &renexists <> "Y" Then
+      rem end DM;
+      Local array of string &CIname;
+      &CIname = %This.getCIname();
+      For &i = 1 To &CIname.Len
+         Local object &ci_obj = CreateObject("PTEM_CONFIG:PTCIAutomationPlugin");
+         &helpMsgArray.Push(&ci_obj.configureEnvironment(&variables, &plugin, &CIname [&i]));
+      End-For;
+   Else
+      &param = CreateArray(&renid);
+      &tempMessage = create PTEM_CONFIG:PTEMHelpMessage(278, 56, "Cannot create Renserver definition since the associated RenServer %1 currently exists.", &param);
+      &helpMsgArray.Push(&tempMessage);
+   End-If;
+   
+   Return Null;
+end-method;
+
+
+method validateVariables
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.validateVariables +/
+   
+   Local array of PTEM_CONFIG:PTEMHelpMessage &helpMsgArray = Null;
+   Local PTEM_CONFIG:PTEMHelpMessage &tempMessage;
+   &helpMsgArray = CreateArrayRept(&tempMessage, 0);
+   Local array of string &param = CreateArray("");
+   Return Null;
+   
+end-method;
+
+method validateConfigurations
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.validateConfigurations +/
+   
+   Local integer &i;
+   Local array of PTEM_CONFIG:PTEMHelpMessage &helpMsgArray = Null;
+   Local PTEM_CONFIG:PTEMHelpMessage &tempMessage;
+   &helpMsgArray = CreateArrayRept(&tempMessage, 0);
+   Local array of string &param = CreateArray("");
+   
+   
+   
+   rem get the CI name from the XML file;
+   
+   Local array of string &ciname;
+   &ciname = %This.getCIname();
+   
+   rem # the host name is stored in DB after converting it to upper case. Hence the conversion;
+   
+   Local string &host = &variables.get("env.host");
+   
+   &variables.remove("env.host");
+   
+   &host = Upper(&host);
+   
+   &variables.put("env.host", &host);
+   
+   rem the password is stored in db after encryption. ;
+   
+   Local string &dest_ks_pass = &variables.get("env.pt_ext_ks_pass");
+   
+   
+   &variables.remove("env.pt_ext_ks_pass");
+   
+   &dest_ks_pass = Decrypt("", &dest_ks_pass);
+   
+   &variables.put("env.pt_ext_ks_pass", &dest_ks_pass);
+   
+   
+   Local object &ci_obj = CreateObject("PTEM_CONFIG:PTCIAutomationPlugin");
+   For &i = 1 To &ciname.Len
+      &helpMsgArray.Push(&ci_obj.validateConfigurations(&variables, &plugin, &ciname [&i]));
+   End-For;
+   Return &helpMsgArray;
+end-method;
+
+method getProperties
+   /+ Returns Array of PTEM_CONFIG:PTEMVariableProperty +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.getProperties +/
+   
+   Local array of PTEM_CONFIG:PTEMVariableProperty &propArray = Null;
+   Local PTEM_CONFIG:PTEMVariableProperty &property;
+   &propArray = CreateArrayRept(&property, 0);
+   Local object &get_prop = CreateObject("PTEM_CONFIG:PTCIAutomationPlugin");
+   Local integer &i;
+   Local array of string &ciname;
+   &ciname = %This.getCIname();
+   
+   For &i = 1 To &ciname.Len
+      &propArray.Push(&get_prop.getProperties(%This, &ciname [&i]));
+   End-For;
+   
+   Return &propArray;
+end-method;
+
+method getCurrentConfiguration
+   /+ &variables as Array of PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PT_PC_UTIL:StringMap +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.getCurrentConfiguration +/
+   Local SQL &sql;
+   Local boolean &bb;
+   Local integer &cnt, &count;
+   &count = 0;
+   Local integer &ctt = 1;
+   Local string &renid;
+   Local string &rendomain;
+   Local string &renport;
+   Local string &renhost;
+   Local string &rensslport;
+   
+   
+   &sql = CreateSQL("SELECT REN_ID FROM PSREN", &renid);
+   
+   While &sql.Fetch(&renid)
+      
+      SQLExec("SELECT DOMAIN, HOST, PORT_NUM, SSLPORT_NUM FROM PSREN WHERE REN_ID = :1", &renid, &rendomain, &renhost, &renport, &rensslport);
+      
+      
+      &variables [&ctt] = create PT_PC_UTIL:StringMap();
+      
+      &variables [&ctt].put("env.ren_definition_id", &renid);
+      &variables [&ctt].put("env.domain", &rendomain);
+      &variables [&ctt].put("env.host", &renhost);
+      &variables [&ctt].put("env.port_num", &renport);
+      &variables [&ctt].put("env.sslport_num", &rensslport);
+      
+      &ctt = &ctt + 1;
+      
+   End-While;
+   Return &variables;
+end-method;
+
+method dependant_plugins
+   /+ Returns Array of String +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.dependant_plugins +/
+   Local array of string &dependant_array;
+   &dependant_array = CreateArray("");
+   Return &dependant_array;
+end-method;
+
+method isInternalPlugin
+   /+ Returns Boolean +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.isInternalPlugin +/
+   Return False;
+end-method;
+

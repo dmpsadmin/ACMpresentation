@@ -1,0 +1,162 @@
+import PT_PC_UTIL:StringMap;
+import PTEM_CONFIG:PTEMHelpMessage;
+import PTEM_CONFIG:PTEMVariableProperty;
+import PTEM_CONFIG:EMConfigurationPlugin;
+import PTEM_CONFIG:ConfigurationFromRecordSet;
+
+
+class PTRenServerCluster extends PTEM_CONFIG:EMConfigurationPlugin
+   method getPluginHelpMessage() Returns PTEM_CONFIG:PTEMHelpMessage;
+   method getProperties() Returns array of PTEM_CONFIG:PTEMVariableProperty;
+   method validateVariables(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;
+   method configureEnvironment(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;
+   method validateConfigurations(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;
+   method dependant_plugins() Returns array of string;
+   method isInternalPlugin() Returns boolean;
+private
+   method property_map_func() Returns array of array of array of string
+end-class;
+
+method getPluginHelpMessage
+   /+ Returns PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.getPluginHelpMessage +/
+   Local PTEM_CONFIG:PTEMHelpMessage &tempMessage = Null;
+   &tempMessage = create PTEM_CONFIG:PTEMHelpMessage(0, 0, "", Null);
+   Return &tempMessage;
+end-method;
+
+method property_map_func
+   /+ Returns Array3 of String +/
+   
+   Local array of array of array of string &properties;
+   &properties = CreateArrayRept(CreateArrayRept(CreateArrayRept("", 0), 0), 0);
+   &properties.Push("PSMCFRENURLID");
+   &properties [1][1].Push("");
+   &properties [1].Push(CreateArray("MCFREN_URL_ID", "env.ren_cluster_id", "string", "false", ""));
+   &properties [1].Push(CreateArray("ACTIVE_FLAG", "env.ren_state_flag", "char", "false", ""));
+   &properties [1].Push(CreateArray("REN_CLUS_ROOT_PATH", "env.cluster_root_path", "string", "false", ""));
+   &properties [1].Push(CreateArray("MCFREN_INT_URL", "env.cluster_url", "string", "false", ""));
+   &properties [1].Push(CreateArray("MCFREN_BROWSER_URL", "env.browser_url", "string", "false", ""));
+   &properties [1].Push(CreateArray("AUTHTOKEN", "env.auth_domain", "string", "false", ""));
+   Return &properties;
+end-method;
+
+method getProperties
+   /+ Returns Array of PTEM_CONFIG:PTEMVariableProperty +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.getProperties +/
+   
+   Local array of PTEM_CONFIG:PTEMVariableProperty &propArray = Null;
+   Local object &obj = Null;
+   Local string &plug = Split(String(%This), ":").Pop();
+   Local array of array of array of string &properties;
+   &properties = %This.property_map_func();
+   &obj = create PTEM_CONFIG:ConfigurationFromRecordSet(&plug, &properties);
+   &propArray = &obj.getProperties();
+   Return &propArray;
+end-method;
+
+method validateVariables
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.validateVariables +/
+   Return Null;
+end-method;
+
+method configureEnvironment
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.configureEnvironment +/
+   Local integer &i, &j;
+   Local array of array of array of string &properties;
+   Local string &record, &recname, &field, &fieldname, &condition, &sqlstring;
+   Local Record &rec;
+   Local Field &recfield;
+   Local SQL &SQL;
+   Local boolean &ret;
+   If %This.hasAccess() = False Then
+      Return Null;
+   End-If;
+   Local object &obj = Null;
+   &properties = %This.property_map_func();
+   &obj = create PTEM_CONFIG:ConfigurationFromRecordSet(Split(String(&plugin), ":").Pop(), &properties);
+   &obj.configurePlugin(&variables);
+   Local boolean &updtflag;
+   Local string &cluster_id = &variables.get("env.ren_cluster_id");
+   Local string &ren_id = &variables.get("env.ren_id");
+   Local string &process_instance = &variables.get("env.process_inst");
+   
+   Local Record &renclstr = CreateRecord(Record.PSRENCLUSTER);
+   &renclstr.MCFREN_URL_ID.Value = &cluster_id;
+   &renclstr.REN_ID.Value = &ren_id;
+   &updtflag = &renclstr.SelectByKey();
+   
+   If &updtflag Then
+      &renclstr.Update();
+      
+   Else
+      &renclstr.MCFREN_URL_ID.Value = &cluster_id;
+      &renclstr.REN_ID.Value = &ren_id;
+      &renclstr.Insert();
+   End-If;
+   
+   Local Record &prinst = CreateRecord(Record.PSREN);
+   &prinst.REN_ID.Value = &ren_id;
+   &updtflag = &prinst.SelectByKey();
+   If &updtflag Then
+      &prinst.PROCESS_INST.Value = &process_instance;
+      &prinst.Update();
+      
+   Else
+      &prinst.REN_ID.Value = &ren_id;
+      &prinst.PROCESS_INST.Value = &process_instance;
+      &prinst.Insert();
+   End-If;
+   
+   
+   
+   Return Null;
+end-method;
+
+method validateConfigurations
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.validateConfigurations +/
+   If %This.hasAccess() = False Then
+      Return Null;
+   End-If;
+   
+   Local array of PTEM_CONFIG:PTEMHelpMessage &helpMsgArray = Null;
+   Local PTEM_CONFIG:PTEMHelpMessage &tempMessage;
+   &helpMsgArray = CreateArrayRept(&tempMessage, 0);
+   
+   Local array of PTEM_CONFIG:PTEMHelpMessage &tempMsgArray = Null;
+   Local object &obj = Null;
+   Local array of array of array of string &properties;
+   &properties = %This.property_map_func();
+   &obj = create PTEM_CONFIG:ConfigurationFromRecordSet(Split(String(&plugin), ":").Pop(), &properties);
+   &tempMsgArray = &obj.validateProperties(&variables);
+   
+   If &tempMsgArray <> Null Then
+      &helpMsgArray.Push(&tempMsgArray);
+   End-If;
+   Return &helpMsgArray;
+end-method;
+
+
+method dependant_plugins
+   /+ Returns Array of String +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.dependant_plugins +/
+   Local array of string &dependant_array;
+   &dependant_array = CreateArray("");
+   Return &dependant_array;
+end-method;
+
+method isInternalPlugin
+   /+ Returns Boolean +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.isInternalPlugin +/
+   Return True;
+end-method;
+

@@ -1,0 +1,122 @@
+import PT_PC_UTIL:StringMap;
+import PTEM_CONFIG:EMConfigurationPlugin;
+import PTEM_CONFIG:PTEMHelpMessage;
+import PTEM_CONFIG:PTEMVariableProperty;
+
+class PTDeleteRenServerDefinition extends PTEM_CONFIG:EMConfigurationPlugin
+   method getPluginHelpMessage() Returns PTEM_CONFIG:PTEMHelpMessage;
+   method getProperties() Returns array of PTEM_CONFIG:PTEMVariableProperty;
+   
+   method validateVariables(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;;
+   method configureEnvironment(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;;
+   method validateConfigurations(&variables As PT_PC_UTIL:StringMap, &plugin As string) Returns array of PTEM_CONFIG:PTEMHelpMessage;
+   method isInternalPlugin() Returns boolean;
+end-class;
+
+Declare Function Refresh_Domain PeopleCode AMM_DERIVED.REFRESH_DOMAIN_PB FieldChange;
+
+method getPluginHelpMessage
+   /+ Returns PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.getPluginHelpMessage +/
+   Local PTEM_CONFIG:PTEMHelpMessage &tempMessage = Null;
+   &tempMessage = create PTEM_CONFIG:PTEMHelpMessage(278, 54, "Plugin to delete an existing Renserver Definition from database", Null);
+   Return &tempMessage;
+end-method;
+
+method getProperties
+   /+ Returns Array of PTEM_CONFIG:PTEMVariableProperty +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.getProperties +/
+   
+   Local array of PTEM_CONFIG:PTEMVariableProperty &propArray;
+   Local PTEM_CONFIG:PTEMVariableProperty &variableProperty;
+   
+   &propArray = CreateArrayRept(&variableProperty, 0);
+   
+   &variableProperty = create PTEM_CONFIG:PTEMVariableProperty("env.ren_definition_id", "string", False, False, "", 278, 55, "RenServer Definition Name to be deleted", Null);
+   &propArray = CreateArray(&variableProperty);
+   &variableProperty = create PTEM_CONFIG:PTEMVariableProperty("env.appserver_domain", "string", False, False, "", 278, 72, "Appserver domain name of the ren definition to be deleted", Null);
+   &propArray.Push(&variableProperty);
+   &variableProperty = create PTEM_CONFIG:PTEMVariableProperty("env.ren_hostname", "string", False, False, "", 278, 73, "Domain name of the ren definition to be deleted", Null);
+   &propArray.Push(&variableProperty);
+   &variableProperty = create PTEM_CONFIG:PTEMVariableProperty("env.inactivate_cluster", "string", False, False, "N", 278, 71, "Value to decide if the associated ren cluster state should be changed to inactive", Null);
+   &propArray.Push(&variableProperty);
+   
+   Return &propArray;
+end-method;
+
+
+method validateVariables
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.validateVariables +/
+   Return Null;
+end-method;
+
+method configureEnvironment
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.configureEnvironment +/
+   Local PTEM_CONFIG:PTEMHelpMessage &helpMsg;
+   Local array of PTEM_CONFIG:PTEMHelpMessage &helpMsgArray;
+   Local array of string &param = Null;
+   &helpMsgArray = CreateArrayRept(&helpMsg, 0);
+   
+   Local string &clustid;
+   Local string &activeflag;
+   
+   If %This.hasAccess() = False Then
+      Return &helpMsgArray;
+   End-If;
+   
+   Local string &renid = &variables.get("env.ren_definition_id");
+   Local string &appdomain = &variables.get("env.appserver_domain");
+   Local string &renhost = &variables.get("env.ren_hostname");
+   
+   If &renid = "" Then
+      SQLExec("SELECT REN_ID FROM PSREN WHERE DOMAIN = :1 AND HOST = :2", &appdomain, &renhost, &renid);
+   End-If;
+   
+   SQLExec("SELECT MCFREN_URL_ID FROM PSRENCLUSTER WHERE REN_ID = :1", &renid, &clustid);
+   SQLExec("SELECT ACTIVE_FLAG FROM PSMCFRENURLID WHERE MCFREN_URL_ID = :1", &clustid, &activeflag);
+   
+   If Upper(&variables.get("env.inactivate_cluster")) = "Y" Then
+      SQLExec("UPDATE PSMCFRENURLID SET ACTIVE_FLAG = :1 WHERE MCFREN_URL_ID = :2", "I", &clustid);
+      SQLExec("UPDATE PSRENCLUS_OWNER SET RENOWNER = :1 WHERE MCFREN_URL_ID = :2", "I", &clustid);
+      &activeflag = "I";
+   End-If;
+   
+   If &activeflag <> "A" Then
+      SQLExec("DELETE FROM PSREN WHERE REN_ID = :1", &renid);
+      SQLExec("DELETE FROM PSRENCLUSTER WHERE REN_ID = :1", &renid);
+      SQLExec("DELETE FROM PSMCFRENURLID WHERE MCFREN_URL_ID = :1", &clustid);
+      SQLExec("DELETE FROM PSRENCLUS_OWNER WHERE MCFREN_URL_ID = :1", &clustid);
+   Else
+      &param = CreateArray(&clustid);
+      &helpMsg = create PTEM_CONFIG:PTEMHelpMessage(278, 56, "Cannot delete Renserver definition since the associated Cluster %1 is in Active State", &param);
+      &helpMsgArray.Push(&helpMsg);
+   End-If;
+   
+   
+   
+   Return &helpMsgArray;
+end-method;
+
+method validateConfigurations
+   /+ &variables as PT_PC_UTIL:StringMap, +/
+   /+ &plugin as String +/
+   /+ Returns Array of PTEM_CONFIG:PTEMHelpMessage +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.validateConfigurations +/
+   Local PTEM_CONFIG:PTEMHelpMessage &helpMsg;
+   Local array of PTEM_CONFIG:PTEMHelpMessage &helpMsgArray;
+   &helpMsgArray = CreateArrayRept(&helpMsg, 0);
+   Return &helpMsgArray;
+end-method;
+
+method isInternalPlugin
+   /+ Returns Boolean +/
+   /+ Extends/implements PTEM_CONFIG:EMConfigurationPlugin.isInternalPlugin +/
+   Return True;
+end-method;
+
