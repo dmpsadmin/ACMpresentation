@@ -1,0 +1,21 @@
+psae.exe -CT <DB type> -CS <server name> -CD <DB name>  -CO <user> -CP <password> -R <runid> -AI PTEM_CONFIG  -I <instance number>
+
+psae.exe -CT ORACLE -CD FSPUM92 -CO VP1 -CP FIN92PUM -R DM1 -AI PTEM_CONFIG 
+
+-TRACE 256 -TOOLSTRACEPC 256
+
+set PS_HOME=E:\fsapps\psoft\pt856fspum92
+
+set PTACM_DEBUG="true"
+
+set PS_FILEDIR=E:\ACMTest
+
+set PTEM_PROP=ReportNode.txt_encrypted
+
+set PTEM_PROP=IBFSPUM92.txt
+
+set PTEM_PROP=IB_TEMPLATE-class.txt
+
+set PTEM_PROP=ESfspum92.txt_encrypted
+
+cd E:\fsapps\psoft\pt856fspum92\bin\client\winx86
