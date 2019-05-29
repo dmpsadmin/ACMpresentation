@@ -1,8 +1,6 @@
 psae.exe -CT <DB type> -CS <server name> -CD <DB name>  -CO <user> -CP <password> -R <runid> -AI PTEM_CONFIG  -I <instance number>
 
-psae.exe -CT ORACLE -CD FSPUM92 -CO VP1 -CP FIN92PUM -R DM1 -AI PTEM_CONFIG 
-
--TRACE 256
+psae.exe -CT ORACLE -CD FSPUM92 -CO VP1 -CP ****** -R DM1 -AI PTEM_CONFIG 
 
 set PS_HOME=E:\fsapps\psoft\pt856fspum92
 set PS_FILEDIR=E:\ACMTest
