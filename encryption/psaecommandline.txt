@@ -1,6 +1,6 @@
 psae.exe -CT <DB type> -CS <server name> -CD <DB name>  -CO <user> -CP <password> -R <runid> -AI PTEM_CONFIG  -I <instance number>
 
-psae.exe -CT ORACLE -CD FSPUM92 -CO VP1 -CP FIN92PUM -R DM1 -AI PTEM_CONFIG 
+psae.exe -CT ORACLE -CD FSPUM92 -CO ACMDEMO -CP ACMTEST1 -R DM1 -AI PTEM_CONFIG 
 
 -TRACE 256 -TOOLSTRACEPC 256
 
